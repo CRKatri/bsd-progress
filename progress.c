@@ -29,6 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
+
 #include <sys/cdefs.h>
 #ifndef lint
 __RCSID("$NetBSD: progress.c,v 1.23 2021/01/07 12:02:52 lukem Exp $");
@@ -50,12 +52,18 @@ __RCSID("$NetBSD: progress.c,v 1.23 2021/01/07 12:02:52 lukem Exp $");
 #include <string.h>
 #include <unistd.h>
 
+	/* LONGLONG */
+long long strsuftoll(const char *, const char *, long long, long long);
+	/* LONGLONG */
+long long strsuftollx(const char *, const char *, long long, long long,
+	    		char *, size_t);
+
 #define GLOBAL			/* force GLOBAL decls in progressbar.h to be
 				 * declared */
 #include "progressbar.h"
 
 static void broken_pipe(int unused);
-__dead static void usage(void);
+static void usage(void);
 
 static void
 broken_pipe(int unused)
@@ -87,7 +95,7 @@ main(int argc, char *argv[])
 	ssize_t nr, nw, off;
 	size_t buffersize;
 	struct stat statb;
-	struct ttysize ts;
+	struct winsize wins;
 
 	setprogname(argv[0]);
 
@@ -199,10 +207,10 @@ main(int argc, char *argv[])
 	progress = 1;
 	ttyout = eflag ? stderr : stdout;
 
-	if (ioctl(fileno(ttyout), TIOCGSIZE, &ts) == -1)
+	if (ioctl(fileno(ttyout), TIOCGWINSZ, &wins) == -1)
 		ttywidth = 80;
 	else
-		ttywidth = ts.ts_cols;
+		ttywidth = wins.ws_col;
 
 	fb_buf = malloc(buffersize);
 	if (fb_buf == NULL)

@@ -60,21 +60,11 @@
  * SUCH DAMAGE.
  */
 
-#if HAVE_NBTOOL_CONFIG_H
-#include "nbtool_config.h"
-#endif
-
 #include <sys/cdefs.h>
 
 #if defined(LIBC_SCCS) && !defined(lint)
 __RCSID("$NetBSD: strsuftoll.c,v 1.9 2011/10/22 22:08:47 christos Exp $");
 #endif /* LIBC_SCCS and not lint */
-
-#ifdef _LIBC
-#include "namespace.h"
-#endif
-
-#if !HAVE_STRSUFTOLL
 
 #include <sys/types.h>
 #include <sys/time.h>
@@ -88,12 +78,11 @@ __RCSID("$NetBSD: strsuftoll.c,v 1.9 2011/10/22 22:08:47 christos Exp $");
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _LIBC
-# ifdef __weak_alias
-__weak_alias(strsuftoll, _strsuftoll)
-__weak_alias(strsuftollx, _strsuftollx)
-# endif
-#endif /* LIBC */
+	/* LONGLONG */
+long long strsuftoll(const char *, const char *, long long, long long);
+	/* LONGLONG */
+long long strsuftollx(const char *, const char *, long long, long long,
+	    		char *, size_t);
 
 /*
  * Convert an expression of the following forms to a (u)int64_t.
@@ -137,9 +126,9 @@ __strsuftollx(const char *desc, const char *val,
 	long long num, t;
 	char	*expr;
 
-	_DIAGASSERT(desc != NULL);
-	_DIAGASSERT(val != NULL);
-	_DIAGASSERT(ebuf != NULL);
+	(void)(desc != NULL);
+	(void)(val != NULL);
+	(void)(ebuf != NULL);
 
 	if (depth > 16) {
 		snprintf(ebuf, ebuflen, "%s: Recursion limit exceeded", desc);
@@ -246,4 +235,3 @@ strsuftollx(const char *desc, const char *val,
 {
 	return __strsuftollx(desc, val, min, max, ebuf, ebuflen, 0);
 }
-#endif /* !HAVE_STRSUFTOLL */
